@@ -1,10 +1,6 @@
 import {BasicAnnotationDescribe, AnnotationUtils, AnnotationGenerator} from "@palerock/annotate-js";
 import {Extra} from "./Extra";
-import {NativeApi} from "./NativeApi";
-import {Computed} from "./Computed";
-import {Props} from "./Props";
 import {utils} from "./utils";
-import {Watch} from "./Watch";
 
 export class VueComponentDescribe extends BasicAnnotationDescribe {
 
@@ -27,7 +23,6 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         super.storageClassDecorator(targetType);
 
         const target = new targetType();
-        this.target = target;
 
         const valuePropertyFilter = ([, descriptor]) => descriptor && 'value' in descriptor;
 
@@ -40,50 +35,21 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         const properties = this.classEntity.properties;
 
         this.dataMap = {};
-        this.nativeMap = {};
-        this.computedMap = {};
-        this.propMap = {};
-        this.watchMap = {};
+        this.configurationMap = {};
 
         Object.keys(propertyMap).forEach(
             key => {
                 const targetProperty = properties.find(property => property.name === key);
                 let isDataOrMethod = true;
                 if (targetProperty) {
-                    const propertyValue = propertyMap[key];
                     if (targetProperty.hasAnnotations(Extra)) {
                         isDataOrMethod = false;
-                    }
-                    if (targetProperty.hasAnnotations(NativeApi)) {
-                        this.nativeMap[key] = propertyMap[key];
-                    }
-                    if (targetProperty.hasAnnotations(Computed)) {
-                        this.computedMap[key] = propertyMap[key];
-                    }
-                    if (targetProperty.hasAnnotations(Props)) {
-                        this.propMap[key] = propertyMap[key];
-                    }
-                    if (targetProperty.hasAnnotations(Watch)) {
-                        const watch = targetProperty.findAnnotationByType(Watch);
-                        if (watch) {
-                            const {deep, immediate} = watch.params;
-                            const propertyKey = watch.watchProperty;
-                            if (!this.watchMap[propertyKey]) {
-                                this.watchMap[propertyKey] = [];
-                            }
-                            if (typeof propertyValue === 'object') {
-                                this.watchMap[propertyKey].push(
-                                    {
-                                        ...propertyValue,
-                                        deep, immediate
-                                    }
-                                );
-                            } else if (['function', 'string'].includes(typeof propertyMap[key])) {
-                                this.watchMap[propertyKey].push({
-                                    handler: propertyValue,
-                                    deep, immediate
-                                });
-                            }
+                        const extraList = targetProperty.getAnnotationsByType(Extra) || [];
+                        extraList.sort((a, b) => {
+                            return b.getParams('priority') - a.getParams('priority')
+                        });
+                        for (const extra of extraList) {
+                            extra.configProperty(target, key, propertyMap[key], this.configurationMap);
                         }
                     }
                 }
@@ -110,80 +76,15 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
             methods, data() {
                 return data
             }
-        })
+        });
     }
 
-    parseComputedMap(result = {}) {
-
-        const getterMap = {};
-        const setterMap = {};
-        const mappedProperties = [];
-
-        if (this.target) {
-            const getterProperties = Object.entries(
-                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'get' in descriptor})
-            );
-            const setterProperties = Object.entries(
-                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'set' in descriptor})
-            );
-            getterProperties.forEach(([name, descriptor]) => {
-                getterMap[name] = {get: descriptor.get};
-                if (!mappedProperties.includes(name)) {
-                    mappedProperties.push(name);
-                }
-            });
-            setterProperties.forEach(([name, descriptor]) => {
-                setterMap[name] = {set: descriptor.set};
-                if (!mappedProperties.includes(name)) {
-                    mappedProperties.push(name);
-                }
-            });
-        }
-
-        const computedMap = {};
-
-        for (const property of mappedProperties) {
-            computedMap[property] = {
-                ...getterMap[property],
-                ...setterMap[property]
-            }
-        }
-
-        result.computed = {...result.computed, ...this.computedMap, ...computedMap};
-    }
-
-    parseNativeApi(result = {}) {
-        const _this = this;
-        const nativeMap = {...this.nativeMap};
-        if ('data' in nativeMap) {
-            const existData = result.data;
-            nativeMap.data = function () {
-                return {
-                    ..._this.nativeMap.data,
-                    ...(typeof existData === 'function' ? existData() : {})
-                };
-            }
-        }
-        Object.assign(result, nativeMap);
-    }
-
-    parsePropMap(result = {}) {
-        result.props = {...result.props, ...this.propMap};
-    }
-
-    parseWatchMap(result = {}) {
-        result.watch = {...result.watch, ...this.watchMap};
-    }
 
     onReturn() {
         const result = {};
         result.name = this.componentName;
         this.parseDataOrMethods(result);
-        this.parseNativeApi(result);
-        this.parseComputedMap(result);
-        this.parsePropMap(result);
-        this.parseWatchMap(result);
-        return result;
+        return Object.assign(result, this.configurationMap);
     }
 
 }

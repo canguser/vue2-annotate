@@ -11,6 +11,8 @@ export class WatchDescribe extends ExtraDescribe {
         });
     }
 
+    watchMap = {};
+
     get defaultKey() {
         return 'property';
     }
@@ -23,6 +25,33 @@ export class WatchDescribe extends ExtraDescribe {
         super.applyProperty(property);
         const originName = this.params.property;
         this.params.property = originName || property.name.replace(/^\$\$/, '');
+    }
+
+    configProperty(target, fieldName, fieldValue, configurationMap) {
+        super.configProperty(target, fieldName, fieldValue, configurationMap);
+        const {deep, immediate} = this.params;
+        const propertyKey = this.watchProperty;
+        if (!this.watchMap[propertyKey]) {
+            this.watchMap[propertyKey] = [];
+        }
+        if (typeof fieldValue === 'object') {
+            this.watchMap[propertyKey].push(
+                {
+                    ...fieldValue,
+                    deep, immediate
+                }
+            );
+        } else if (['function', 'string'].includes(typeof fieldValue)) {
+            this.watchMap[propertyKey].push({
+                handler: fieldValue,
+                deep, immediate
+            });
+        }
+        this.parseWatchMap(configurationMap);
+    }
+
+    parseWatchMap(result = {}) {
+        result.watch = {...result.watch, ...this.watchMap};
     }
 }
 
