@@ -23,6 +23,7 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         super.storageClassDecorator(targetType);
 
         const target = new targetType();
+        this.target = target;
 
         const valuePropertyFilter = ([, descriptor]) => descriptor && 'value' in descriptor;
 
@@ -35,7 +36,9 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         const properties = this.classEntity.properties;
 
         this.dataMap = {};
-        this.configurationMap = {};
+        this.configurationMap = {
+            name: this.componentName
+        };
 
         Object.keys(propertyMap).forEach(
             key => {
@@ -79,12 +82,49 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         });
     }
 
+    parseGetterSetter(result = {}) {
+        const getterMap = {};
+        const setterMap = {};
+        const mappedProperties = [];
+
+        if (this.target) {
+            const getterProperties = Object.entries(
+                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'get' in descriptor})
+            );
+            const setterProperties = Object.entries(
+                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'set' in descriptor})
+            );
+            getterProperties.forEach(([name, descriptor]) => {
+                getterMap[name] = {get: descriptor.get};
+                if (!mappedProperties.includes(name)) {
+                    mappedProperties.push(name);
+                }
+            });
+            setterProperties.forEach(([name, descriptor]) => {
+                setterMap[name] = {set: descriptor.set};
+                if (!mappedProperties.includes(name)) {
+                    mappedProperties.push(name);
+                }
+            });
+        }
+
+        const computedMap = {};
+
+        for (const property of mappedProperties) {
+            computedMap[property] = {
+                ...getterMap[property],
+                ...setterMap[property]
+            }
+        }
+
+        result.computed = {...result.computed, ...computedMap};
+    }
+
 
     onReturn() {
-        const result = {};
-        result.name = this.componentName;
-        this.parseDataOrMethods(result);
-        return Object.assign(result, this.configurationMap);
+        this.parseDataOrMethods(this.configurationMap);
+        this.parseGetterSetter(this.configurationMap);
+        return {...this.configurationMap};
     }
 
 }

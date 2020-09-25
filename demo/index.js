@@ -1,3 +1,3 @@
 require("@babel/register");
-require('./watch');
-// require('./demo');
+// require('./watch');
+require('./demo');
