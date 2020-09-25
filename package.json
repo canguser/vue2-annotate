@@ -1,0 +1,46 @@
+{
+  "name": "@palerock/vue2-annotate",
+  "version": "1.0.1",
+  "description": "Using annotate for Vue",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "build": "babel src -d dist",
+    "do-publish": "npm run build && npm publish --access public"
+  },
+  "dependencies": {
+    "@palerock/annotate-js": "^1.2.26"
+  },
+  "files": [
+    "src",
+    "dist",
+    "package.json",
+    "LICENSE",
+    "readme.md",
+    "types/*.d.ts"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "nodemon": "^1.19.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canguser/vue2-annotate.git"
+  },
+  "keywords": [
+    "Vue",
+    "Annotate",
+    "Decorator"
+  ],
+  "author": "Cangshi",
+  "license": "Apache License 2.0",
+  "bugs": {
+    "url": "https://github.com/canguser/vue2-annotate/issues"
+  },
+  "homepage": "https://github.com/canguser/vue2-annotate#readme"
+}
