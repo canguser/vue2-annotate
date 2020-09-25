@@ -111,9 +111,9 @@ class HelloWorld {
 yarn run serve
 ```
 进入页面，输出内容如下图：  
-![image.png](https://palerock.cn/api-provider/files/view?identity=L2FydGljbGUvaW1hZ2UvMjAyMDA5MjUxMTUyMjY4NjM0Y1FUZFNUTy5wbmc=)
+![image.png](https://palerock.cn/api-provider/files/view?identity=L2FydGljbGUvaW1hZ2UvMjAyMDA5MjUxMTUyMjY4NjM0Y1FUZFNUTy5wbmc=)  
 点击副标题，弹出内容如下图：  
-![image.png](https://palerock.cn/api-provider/files/view?identity=L2FydGljbGUvaW1hZ2UvMjAyMDA5MjUxMTUzMjk2MzFlUkRQRzNIVi5wbmc=)
+![image.png](https://palerock.cn/api-provider/files/view?identity=L2FydGljbGUvaW1hZ2UvMjAyMDA5MjUxMTUzMjk2MzFlUkRQRzNIVi5wbmc=)  
 ### 类比
 在 Demo 中我们在 Vue 中使用 class 语法并且使用注解完成了一个简单的 HelloWorld 组件，若是不使用注解其等同代码结构应该如下：
 ```javascript
