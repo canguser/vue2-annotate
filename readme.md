@@ -150,7 +150,8 @@ export default {
 ## 预置注解
 ### @VueComponent
 该注解作用于 class，例子如 [Demo](#demo) 所示，其内部未加注解的成员属性含义如下：
-- getter 方法: 同 @Computed
+- getter 方法: 同 @Computed get
+- setter 方法: 同 @Computed set
 - 普通方法: 相当用未使用注解中的 methods
     ```javascript
     @VueComponent

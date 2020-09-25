@@ -3,19 +3,7 @@ import {Extra} from "./Extra";
 import {NativeApi} from "./NativeApi";
 import {Computed} from "./Computed";
 import {Props} from "./Props";
-
-const getGetterProperties = target => {
-    return [
-        ...Object.getOwnPropertyNames(target)
-            .map(property => ({name: property, descriptor: Object.getOwnPropertyDescriptor(target, property)}))
-            .filter(property => 'get' in property.descriptor),
-        ...Object.getOwnPropertyNames(Object.getPrototypeOf(target))
-            .map(property => ({
-                name: property, descriptor: Object.getOwnPropertyDescriptor(Object.getPrototypeOf(target), property)
-            }))
-            .filter(property => 'get' in property.descriptor)
-    ];
-};
+import {utils} from "./utils";
 
 export class VueComponentDescribe extends BasicAnnotationDescribe {
 
@@ -40,22 +28,12 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         const target = new targetType();
         this.target = target;
 
-        const valuePropertyFilter = target => {
-            return name => {
-                const describe = Object.getOwnPropertyDescriptor(target, name);
-                return describe && ('value' in describe)
-            }
-        };
+        const valuePropertyFilter = ([, descriptor]) => descriptor && 'value' in descriptor;
 
         const propertyMap = AnnotationUtils.fromEntries(
-            [
-                ...Object.getOwnPropertyNames(target)
-                    .filter(valuePropertyFilter(target)),
-                ...Object.getOwnPropertyNames(Object.getPrototypeOf(target))
-                    .filter(valuePropertyFilter(
-                        Object.getPrototypeOf(target)
-                    ))
-            ].map(key => [key, target[key]])
+            Object.entries(
+                utils.getDescriptors(target, {filter: valuePropertyFilter})
+            ).map(([name, descriptor]) => [name, descriptor.value])
         );
 
         const properties = this.classEntity.properties;
@@ -112,15 +90,40 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
     parseComputedMap(result = {}) {
 
         const getterMap = {};
+        const setterMap = {};
+        const mappedProperties = [];
 
         if (this.target) {
-            const getterProperties = getGetterProperties(this.target);
-            getterProperties.forEach(property => {
-                getterMap[property.name] = property.descriptor.get;
-            })
+            const getterProperties = Object.entries(
+                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'get' in descriptor})
+            );
+            const setterProperties = Object.entries(
+                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'set' in descriptor})
+            );
+            getterProperties.forEach(([name, descriptor]) => {
+                getterMap[name] = {get: descriptor.get};
+                if (!mappedProperties.includes(name)) {
+                    mappedProperties.push(name);
+                }
+            });
+            setterProperties.forEach(([name, descriptor]) => {
+                setterMap[name] = {set: descriptor.set};
+                if (!mappedProperties.includes(name)) {
+                    mappedProperties.push(name);
+                }
+            });
         }
 
-        result.computed = {...result.computed, ...this.computedMap, ...getterMap};
+        const computedMap = {};
+
+        for (const property of mappedProperties) {
+            computedMap[property] = {
+                ...getterMap[property],
+                ...setterMap[property]
+            }
+        }
+
+        result.computed = {...result.computed, ...this.computedMap, ...computedMap};
     }
 
     parseNativeApi(result = {}) {
