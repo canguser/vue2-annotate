@@ -151,7 +151,7 @@ export default {
 ### @VueComponent
 该注解作用于 class，例子如 [Demo](#demo) 所示，其内部未加注解的成员属性含义如下：
 - getter 方法: 同 @Computed get
-- setter 方法: 同 @Computed set
+- setter 方法: 同 @Computed set (使用 setter 必须指定该属性的 getter)
 - 普通方法: 相当用未使用注解中的 methods
     ```javascript
     @VueComponent
@@ -264,7 +264,7 @@ class A{
 - `property`： `默认参数` `string` 需要监听的属性名，若未设置该参数，会获取被装饰的属性名作为其值。
 	- 注意：在未设置该参数的情况下**为了避免属性名冲突，可以在属性名前加上 `$$` 也可以被正常解析**
 - `deep`：`boolean` 默认值：`false` 监听时是否遍历子对象
-- `immediate：`boolean` 默认值：`false` 是否在侦听开始之后被立即调用
+- `immediate`：`boolean` 默认值：`false` 是否在侦听开始之后被立即调用
 
 ```javascript
 @VueComponent
