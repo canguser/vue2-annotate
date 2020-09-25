@@ -258,6 +258,58 @@ class A{
     }
 })
 ```
+### @Watch
+必须作用于 `@VueComponent` 装饰的 class，用于监听属性的改变  
+参数：  
+- `property`： `默认参数` `string` 需要监听的属性名，若未设置该参数，会获取被装饰的属性名作为其值。
+	- 注意：在未设置该参数的情况下**为了避免属性名冲突，可以在属性名前加上 `$$` 也可以被正常解析**
+- `deep`：`boolean` 默认值：`false` 监听时是否遍历子对象
+- `immediate：`boolean` 默认值：`false` 是否在侦听开始之后被立即调用
+
+```javascript
+@VueComponent
+class A {
+
+    @Watch
+    $$gender(val, oldVal) {
+    }
+    
+    @Watch({deep: true, immediate: true})
+    $$age(val, oldVal) {
+    }
+
+    @Watch('name')
+    handleNameChanged = 'handleAgeChanged';
+
+    @Watch({property: 'name', deep: true})
+    handleNameChanged2(val, oldVal) {
+    }
+    
+}
+```
+相当于：
+```javascript
+({
+    name: 'A',
+    watch: {
+        age: {
+            handler(val, oldVal) {
+            },
+            deep: true, immediate: true
+        },
+        gender(val, oldVal) {
+        },
+        name: [
+            'handleAgeChanged',
+            {
+                handler(val, oldVal) {
+                }
+            }
+        ]
+    }
+});
+```
+
 ### @NativeApi
 必须作用于 `@VueComponent` 装饰的 class，表示使用 Vue 原生属性
 ```javascript

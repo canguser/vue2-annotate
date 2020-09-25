@@ -4,6 +4,7 @@ import {NativeApi} from "./NativeApi";
 import {Computed} from "./Computed";
 import {Props} from "./Props";
 import {utils} from "./utils";
+import {Watch} from "./Watch";
 
 export class VueComponentDescribe extends BasicAnnotationDescribe {
 
@@ -42,12 +43,14 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         this.nativeMap = {};
         this.computedMap = {};
         this.propMap = {};
+        this.watchMap = {};
 
         Object.keys(propertyMap).forEach(
             key => {
                 const targetProperty = properties.find(property => property.name === key);
                 let isDataOrMethod = true;
                 if (targetProperty) {
+                    const propertyValue = propertyMap[key];
                     if (targetProperty.hasAnnotations(Extra)) {
                         isDataOrMethod = false;
                     }
@@ -59,6 +62,29 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
                     }
                     if (targetProperty.hasAnnotations(Props)) {
                         this.propMap[key] = propertyMap[key];
+                    }
+                    if (targetProperty.hasAnnotations(Watch)) {
+                        const watch = targetProperty.findAnnotationByType(Watch);
+                        if (watch) {
+                            const {deep, immediate} = watch.params;
+                            const propertyKey = watch.watchProperty;
+                            if (!this.watchMap[propertyKey]) {
+                                this.watchMap[propertyKey] = [];
+                            }
+                            if (typeof propertyValue === 'object') {
+                                this.watchMap[propertyKey].push(
+                                    {
+                                        ...propertyValue,
+                                        deep, immediate
+                                    }
+                                );
+                            } else if (['function', 'string'].includes(typeof propertyMap[key])) {
+                                this.watchMap[propertyKey].push({
+                                    handler: propertyValue,
+                                    deep, immediate
+                                });
+                            }
+                        }
                     }
                 }
                 if (isDataOrMethod) {
@@ -145,13 +171,18 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         result.props = {...result.props, ...this.propMap};
     }
 
+    parseWatchMap(result = {}) {
+        result.watch = {...result.watch, ...this.watchMap};
+    }
+
     onReturn() {
         const result = {};
         result.name = this.componentName;
         this.parseDataOrMethods(result);
+        this.parseNativeApi(result);
         this.parseComputedMap(result);
         this.parsePropMap(result);
-        this.parseNativeApi(result);
+        this.parseWatchMap(result);
         return result;
     }
 
