@@ -77,7 +77,7 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         );
         Object.assign(result, {
             methods, data() {
-                return data
+                return utils.deepClone(data)
             }
         });
     }
