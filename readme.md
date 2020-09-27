@@ -227,6 +227,34 @@ class A{
 })
 ```
 
+### @Model
+必须作用于 `@VueComponent` 装饰的 class，表示使用 Vue Model 属性  
+被该注解装饰后的属性同样视为 `props`，并且写入 model 属性。  
+参数：  
+- `changeEvent`: `string` `默认属性`  默认值：`value`
+```javascript
+@VueComponent
+class A {
+
+    @Model
+    value = String;
+
+}
+```
+等同于：
+```javascript
+({
+    name: 'A',
+    props: {
+        value: String
+    },
+    model:{
+        prop: 'value',
+        event: 'change'
+    }
+});
+```
+
 ### @Computed
 必须作用于 `@VueComponent` 装饰的 class，表示计算属性。
 ```javascript
