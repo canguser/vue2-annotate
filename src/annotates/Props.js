@@ -8,13 +8,14 @@ export class PropDescribe extends ExtraDescribe {
     constructor() {
         super();
         Object.assign(this.params, {
+            name: '',
             model: false,
             changeEvent: 'change'
         });
     }
 
     get defaultKey() {
-        return 'model';
+        return 'name';
     }
 
     configProperty(target, fieldName, fieldValue, configurationMap) {
@@ -24,12 +25,30 @@ export class PropDescribe extends ExtraDescribe {
     }
 
     parsePropMap(result = {}) {
-        const {model, changeEvent} = this.params;
+        const {name, model, changeEvent} = this.params;
         const [fieldName, fieldValue] = this.propertyEntry;
-        result.props = {...result.props, ...{[fieldName]: fieldValue}};
+        console.log(name);
+        const propsName = name || fieldName;
+        result.props = {...result.props, ...{[propsName]: fieldValue}};
+
+        if (name && name !== fieldName) {
+            // using two ways
+            result.computed = {
+                ...result.computed,
+                [fieldName]: {
+                    get() {
+                        return this[name];
+                    },
+                    set(value) {
+                        this.$emit(changeEvent, value);
+                    }
+                }
+            };
+        }
+
         if (model && !result.model) {
             result.model = {
-                prop: fieldName,
+                prop: propsName,
                 event: changeEvent
             }
         }

@@ -76,9 +76,7 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
             }
         );
         Object.assign(result, {
-            methods, data() {
-                return utils.deepClone(data)
-            }
+            methods: {...result.methods, ...methods}, data: {...result.data, ...data}
         });
     }
 
@@ -124,6 +122,12 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
     onReturn() {
         this.parseDataOrMethods(this.configurationMap);
         this.parseGetterSetter(this.configurationMap);
+        if (this.configurationMap.data) {
+            const _this = this;
+            this.configurationMap.data = function () {
+                return utils.deepClone(_this.configurationMap.data);
+            };
+        }
         return {...this.configurationMap};
     }
 

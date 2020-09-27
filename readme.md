@@ -231,7 +231,12 @@ class A{
 必须作用于 `@VueComponent` 装饰的 class，表示使用 Vue Model 属性  
 被该注解装饰后的属性同样视为 `props`，并且写入 model 属性。  
 参数：  
-- `changeEvent`: `string` `默认属性`  默认值：`value`
+- `name`: `string`  `默认属性` 默认值：被装饰的属性名
+	- 表示监听的 `prop` 名
+	- 如果该属性与被装饰的属性名不一致，则将被装饰的属性名视为`计算属性`, 详情如下面第二个例子
+- `changeEvent`: `string` 默认值：`value`
+
+例1:
 ```javascript
 @VueComponent
 class A {
@@ -251,6 +256,39 @@ class A {
     model:{
         prop: 'value',
         event: 'change'
+    }
+});
+```
+例2:
+```javascript
+@VueComponent
+class B {
+
+    @Model('value') // name 属性为 value, 被装饰属性名为 content
+    content = String;
+
+}
+```
+等同于：
+```javascript
+({
+    name: 'B',
+    props: {
+        value: String
+    },
+    model: {
+        prop: 'value',
+        event: 'change'
+    },
+    computed: {
+        content: {
+            get() {
+                return this.value;
+            },
+            set(value) {
+                this.$emit('change', value);
+            }
+        }
     }
 });
 ```

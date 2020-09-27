@@ -6,7 +6,4 @@ export class Model {
 
     model = true;
 
-    @DefaultParam
-    changeEvent = 'change';
-
 }

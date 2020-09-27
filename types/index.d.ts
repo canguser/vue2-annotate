@@ -8,15 +8,17 @@ export function NativeApi(): void;
 
 export function Props(
     params?: {
+        name?: string,
         model?: boolean,
         changeEvent?: string
-    } | boolean
+    } | string
 ): void;
 
 export function Watch(params?: { property?: string, deep?: boolean, immediate?: boolean } | string): void;
 
 export function Model(
     params?: {
+        name?: string,
         model?: boolean,
         changeEvent?: string
     } | string
