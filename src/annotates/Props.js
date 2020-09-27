@@ -27,7 +27,6 @@ export class PropDescribe extends ExtraDescribe {
     parsePropMap(result = {}) {
         const {name, model, changeEvent} = this.params;
         const [fieldName, fieldValue] = this.propertyEntry;
-        console.log(name);
         const propsName = name || fieldName;
         result.props = {...result.props, ...{[propsName]: fieldValue}};
 

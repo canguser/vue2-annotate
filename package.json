@@ -1,6 +1,6 @@
 {
   "name": "@palerock/vue2-annotate",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Using annotate for Vue",
   "main": "dist/index.js",
   "types": "types/index.d.ts",

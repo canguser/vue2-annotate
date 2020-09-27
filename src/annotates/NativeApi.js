@@ -3,25 +3,27 @@ import {ExtraDescribe} from "./Extra";
 
 export class NativeApiDescribe extends ExtraDescribe {
 
-    nativeMap = {};
+    nativePropertyEntry = {};
+
+    functionReturningProperties = ['data', 'provide'];
 
     configProperty(target, fieldName, fieldValue, configurationMap) {
         super.configProperty(target, fieldName, fieldValue, configurationMap);
-        this.nativeMap[fieldName] = fieldValue;
+        this.nativePropertyEntry = [fieldName, fieldValue];
         this.parseNativeApi(configurationMap);
     }
 
     parseNativeApi(result = {}) {
-        const _this = this;
-        const nativeMap = {...this.nativeMap};
-        if ('data' in nativeMap) {
-            const existData = result.data;
-            nativeMap.data = function () {
-                return {
-                    ..._this.nativeMap.data,
-                    ...(typeof existData === 'function' ? existData() : {})
-                };
+        const [fieldName, fieldValue] = this.nativePropertyEntry;
+        const nativeMap = {};
+        if (this.functionReturningProperties.includes(fieldName) && typeof fieldValue === 'function') {
+            const exist = result[fieldName];
+            nativeMap[fieldName] = {
+                ...exist,
+                ...fieldValue()
             }
+        } else {
+            nativeMap[fieldName] = fieldValue;
         }
         Object.assign(result, nativeMap);
     }
