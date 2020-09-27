@@ -123,9 +123,9 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         this.parseDataOrMethods(this.configurationMap);
         this.parseGetterSetter(this.configurationMap);
         if (this.configurationMap.data) {
-            const _this = this;
+            const data = this.configurationMap.data;
             this.configurationMap.data = function () {
-                return utils.deepClone(_this.configurationMap.data);
+                return utils.deepClone(data);
             };
         }
         return {...this.configurationMap};
