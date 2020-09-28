@@ -234,7 +234,7 @@ class A{
 - `name`: `string`  `默认属性` 默认值：被装饰的属性名
 	- 表示监听的 `prop` 名
 	- 如果该属性与被装饰的属性名不一致，则将被装饰的属性名视为`计算属性`, 详情如下面第二个例子
-- `changeEvent`: `string` 默认值：`value`
+- `changeEvent`: `string` 默认值：`change`
 
 例1:
 ```javascript
