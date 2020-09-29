@@ -1,5 +1,5 @@
 require("@babel/register");
-// require('./watch');
-// require('./demo');
-// require('./model');
+require('./watch');
+require('./demo');
+require('./model');
 require('./native');

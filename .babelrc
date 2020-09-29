@@ -16,7 +16,6 @@
       {
         "loose": true
       }
-    ],
-    "@babel/plugin-proposal-function-bind"
+    ]
   ]
 }

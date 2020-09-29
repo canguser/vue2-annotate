@@ -19,11 +19,9 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         return this.name || this.classEntity.name;
     }
 
-    storageClassDecorator(targetType) {
-        super.storageClassDecorator(targetType);
-
-        const target = new targetType();
-        this.target = target;
+    onClassDecorated(params) {
+        super.onClassDecorated(params);
+        const target = this.targetInstance;
 
         const valuePropertyFilter = ([, descriptor]) => descriptor && 'value' in descriptor;
 
@@ -85,12 +83,12 @@ export class VueComponentDescribe extends BasicAnnotationDescribe {
         const setterMap = {};
         const mappedProperties = [];
 
-        if (this.target) {
+        if (this.targetInstance) {
             const getterProperties = Object.entries(
-                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'get' in descriptor})
+                utils.getDescriptors(this.targetInstance, {filter: ([, descriptor]) => descriptor && 'get' in descriptor})
             );
             const setterProperties = Object.entries(
-                utils.getDescriptors(this.target, {filter: ([, descriptor]) => descriptor && 'set' in descriptor})
+                utils.getDescriptors(this.targetInstance, {filter: ([, descriptor]) => descriptor && 'set' in descriptor})
             );
             getterProperties.forEach(([name, descriptor]) => {
                 getterMap[name] = {get: descriptor.get};
