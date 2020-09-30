@@ -155,7 +155,7 @@ export default {
 - `@DynamicParam` 配合 `@Annoate` 用于指定动态参数
 
 关于以上注解的基本用法可以参考其 [API文档](https://palerock.cn/projects/006T5t9zyHi#surround)。  
-> 由于本框架完全依赖于 `Annotate JS 框架`，为了方便开发，以上注解在 `^1.0.16` 版本以后可以直接由该框架引入：  
+> 由于本框架完全依赖于 `Annotate JS 框架`，为了方便开发，以上注解在 `^1.0.18` 版本以后可以直接由该框架引入：  
 `import {Annotate, Surround, DefaultParam, DynamicParam} from "@palerock/vue2-annotate";`
 
 了解了以上注解的基本用法后，我们以几个简单的例子来实现自定义注解
