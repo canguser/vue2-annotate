@@ -23,3 +23,12 @@ export function Model(
         changeEvent?: string
     } | string
 ): void;
+
+export {
+    Surround,
+    Annotate,
+    BasicAnnotationDescribe,
+    AnnotationGenerator,
+    DynamicParam,
+    DefaultParam
+} from '@palerock/annotate-js'
