@@ -1,6 +1,6 @@
 {
   "name": "@palerock/vue2-annotate",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Using annotate for Vue",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
@@ -10,7 +10,7 @@
     "do-publish": "npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@palerock/annotate-js": "^1.2.38",
+    "@palerock/annotate-js": "^1.2.40",
     "@babel/polyfill": "^7.11.5"
   },
   "files": [
