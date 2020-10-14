@@ -52,14 +52,14 @@ export const utils = {
             return new Date(obj);
         }
         if (Array.isArray(obj)) {
-            return obj.map(o => typeof o === 'object' ? utils.deepClone(o, deep - 1, objectStack.concat(obj)) : o);
+            return obj.map(o => typeof o === 'object' ? utils.deepClone(o, deep - 1, objectStack.concat([obj])) : o);
         }
 
         const result = utils.shallowClone(obj);
         utils.getKeyValues(result).forEach(
             ([key, value]) => {
                 if (typeof value === 'object') {
-                    result[key] = utils.deepClone(value, deep - 1, objectStack.concat(obj));
+                    result[key] = utils.deepClone(value, deep - 1, objectStack.concat([obj]));
                 }
             }
         );

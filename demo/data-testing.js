@@ -6,7 +6,12 @@ class A {
         name: 'vue2-annotate',
         author: {
             name: 'changshi'
-        }
+        },
+        logs: [
+            {a: 1},
+            {b: 2},
+            {c: 2},
+        ]
     }
 }
 
